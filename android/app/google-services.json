@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "668530376762",
+    "project_id": "funny-video-5ac89",
+    "storage_bucket": "funny-video-5ac89.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:668530376762:android:7b555745e2c153be0d3503",
+        "android_client_info": {
+          "package_name": "com.nullit00.funnyzone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "668530376762-7ov21msv9dkirrhnvh60q11538s29ns5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nullit00.funnyzone",
+            "certificate_hash": "11673524b32ccc38c47f8b674f6ab1f87b3a7224"
+          }
+        },
+        {
+          "client_id": "668530376762-suq7l856rkcc1gahiftnag0lgh3rld4r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjJFoJoLbJlowLHuaBnyr3FSxqAIUFKKE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "668530376762-suq7l856rkcc1gahiftnag0lgh3rld4r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
