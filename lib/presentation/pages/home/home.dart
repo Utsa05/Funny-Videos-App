@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> {
             return Scaffold(
               key: _scaffoldKey,
               drawer: const AppDrawer(),
-              appBar: homeAppbar(context),
+              appBar: homeAppbar(context, state.videos),
               body: AllViews(videos: state.videos),
             );
           } else if (state is VideoNoInternet) {
@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  AppBar homeAppbar(BuildContext context) {
+  AppBar homeAppbar(BuildContext context, List<VideoEntity> videos) {
     return AppBar(
       leadingWidth: 0,
       iconTheme: const IconThemeData(color: AppColor.gold, size: 0.0),
@@ -77,7 +77,8 @@ class _HomePageState extends State<HomePage> {
           child: IconButton(
             splashRadius: 20,
             onPressed: () {
-              Navigator.pushNamed(context, AppString.searchroute);
+              Navigator.pushNamed(context, AppString.searchroute,
+                  arguments: videos);
             },
             icon: const Icon(
               Icons.search_outlined,
@@ -86,23 +87,23 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(
-            top: 3.0,
-            bottom: 4.0,
-          ),
-          child: IconButton(
-            splashRadius: 20,
-            onPressed: () {
-              Navigator.pushNamed(context, AppString.favoriteroute);
-            },
-            icon: const Icon(
-              Icons.favorite_outline,
-              size: 25.0,
-              color: AppColor.white,
-            ),
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.only(
+        //     top: 3.0,
+        //     bottom: 4.0,
+        //   ),
+        //   child: IconButton(
+        //     splashRadius: 20,
+        //     onPressed: () {
+        //       Navigator.pushNamed(context, AppString.favoriteroute);
+        //     },
+        //     icon: const Icon(
+        //       Icons.favorite_outline,
+        //       size: 25.0,
+        //       color: AppColor.white,
+        //     ),
+        //   ),
+        // ),
         Padding(
             padding: const EdgeInsets.only(
               right: 10.0,
@@ -149,19 +150,25 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class AllViews extends StatelessWidget {
+class AllViews extends StatefulWidget {
   const AllViews({
     super.key,
     required this.videos,
   });
   final List<VideoEntity> videos;
+
+  @override
+  State<AllViews> createState() => _AllViewsState();
+}
+
+class _AllViewsState extends State<AllViews> {
   @override
   Widget build(BuildContext context) {
     final random = Random();
 
     List<VideoEntity> getCategorybyVideo(String category) {
       List<VideoEntity> list = [];
-      for (var video in videos) {
+      for (var video in widget.videos) {
         if (video.category.toLowerCase().toString() == category.toLowerCase()) {
           list.add(video);
         }
@@ -180,115 +187,125 @@ class AllViews extends StatelessWidget {
     mostviewsVideos.shuffle(random);
     trandingVideos.shuffle(random);
     return TabBarView(physics: const NeverScrollableScrollPhysics(), children: [
-      CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-              child: Padding(
-            padding: const EdgeInsets.only(left: 5.0, right: 5.0, bottom: 10.0),
-            child: TopVideos(videos: mostviewsVideos),
-          )),
-          SliverGrid(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 1,
-                mainAxisExtent: 200.0,
-                mainAxisSpacing: 10.0,
-                crossAxisSpacing: 10.0),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                var videoItem = videos[random.nextInt(videos.length)];
-                String? id = YoutubePlayer.convertUrlToId(
-                    videoItem.videoLink.toString());
+      RefreshIndicator(
+        color: AppColor.gold,
+        onRefresh: (() async {
+          widget.videos.shuffle(Random());
+          widget.videos.shuffle(Random());
+          setState(() {});
+        }),
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+                child: Padding(
+              padding:
+                  const EdgeInsets.only(left: 5.0, right: 5.0, bottom: 10.0),
+              child: TopVideos(videos: hotVideos),
+            )),
+            SliverGrid(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 1,
+                  mainAxisExtent: 200.0,
+                  mainAxisSpacing: 10.0,
+                  crossAxisSpacing: 10.0),
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  var videoItem =
+                      widget.videos[random.nextInt(widget.videos.length)];
+                  String? id = YoutubePlayer.convertUrlToId(
+                      videoItem.videoLink.toString());
 
-                return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                    child: CachedNetworkImage(
-                      imageUrl: 'https://img.youtube.com/vi/$id/0.jpg',
-                      placeholder: (context, url) => const Center(
-                          child: Padding(
-                        padding: EdgeInsets.all(15.0),
-                        child: CircularProgressIndicator(
-                          color: AppColor.gold,
-                        ),
-                      )),
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.error),
-                      imageBuilder: (context, imageProvider) {
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(10.0),
-                          child: Ink.image(
-                            image: imageProvider,
-                            fit: BoxFit.cover,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(6.0),
-                              onTap: (() {
-                                Navigator.pushNamed(
-                                    context, AppString.viewvideo,
-                                    arguments: SenderEnity(
-                                        videos: videos,
-                                        url: videoItem.videoLink,
-                                        category: videoItem.category));
-                              }),
-                              child: Stack(
-                                children: [
-                                  Center(
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0,
-                                      ),
-                                      decoration: BoxDecoration(
-                                          color:
-                                              AppColor.black.withOpacity(0.4),
-                                          borderRadius:
-                                              BorderRadius.circular(5.0)),
-                                      child: const Icon(
-                                        Icons.play_arrow,
-                                        color: AppColor.white,
-                                        size: 35,
-                                      ),
-                                    ),
-                                  ),
-                                  Align(
-                                    alignment: Alignment.bottomCenter,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 7.0),
-                                      width: double.infinity,
-                                      color: AppColor.black.withOpacity(0.4),
-                                      child: Text(
-                                        "Play Now",
-                                        overflow: TextOverflow.ellipsis,
-                                        textAlign: TextAlign.center,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyText2!
-                                            .copyWith(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 15.0,
-                                                color: AppColor.white),
+                  return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: CachedNetworkImage(
+                        imageUrl: 'https://img.youtube.com/vi/$id/0.jpg',
+                        placeholder: (context, url) => const Center(
+                            child: Padding(
+                          padding: EdgeInsets.all(15.0),
+                          child: CircularProgressIndicator(
+                            color: AppColor.gold,
+                          ),
+                        )),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
+                        imageBuilder: (context, imageProvider) {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(10.0),
+                            child: Ink.image(
+                              image: imageProvider,
+                              fit: BoxFit.cover,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(6.0),
+                                onTap: (() {
+                                  Navigator.pushNamed(
+                                      context, AppString.viewvideo,
+                                      arguments: SenderEnity(
+                                          videos: widget.videos,
+                                          url: videoItem.videoLink,
+                                          category: videoItem.category));
+                                }),
+                                child: Stack(
+                                  children: [
+                                    Center(
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0,
+                                        ),
+                                        decoration: BoxDecoration(
+                                            color:
+                                                AppColor.black.withOpacity(0.4),
+                                            borderRadius:
+                                                BorderRadius.circular(5.0)),
+                                        child: const Icon(
+                                          Icons.play_arrow,
+                                          color: AppColor.white,
+                                          size: 35,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                    Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 7.0),
+                                        width: double.infinity,
+                                        color: AppColor.black.withOpacity(0.4),
+                                        child: Text(
+                                          "Play Now",
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.center,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText2!
+                                              .copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 15.0,
+                                                  color: AppColor.white),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    ));
-              },
-              childCount: videos.length,
-            ),
-          )
-        ],
+                          );
+                        },
+                      ));
+                },
+                childCount: widget.videos.length,
+              ),
+            )
+          ],
+        ),
       ),
       VideoGrid(
         videos: recentVideos,
-        allvideos: videos,
+        allvideos: widget.videos,
       ),
-      VideoGrid(videos: mostviewsVideos, allvideos: videos),
-      VideoGrid(videos: trandingVideos, allvideos: videos),
-      VideoGrid(videos: popularVideos, allvideos: videos),
-      VideoGrid(videos: hotVideos, allvideos: videos),
+      VideoGrid(videos: mostviewsVideos, allvideos: widget.videos),
+      VideoGrid(videos: trandingVideos, allvideos: widget.videos),
+      VideoGrid(videos: popularVideos, allvideos: widget.videos),
+      VideoGrid(videos: hotVideos, allvideos: widget.videos),
     ]);
   }
 }

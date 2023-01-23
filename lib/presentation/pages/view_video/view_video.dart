@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:funny_zone_app/domain/entities/sener.dart';
 import 'package:funny_zone_app/domain/entities/video_entity.dart';
 import 'package:funny_zone_app/presentation/constants/color.dart';
+import 'package:funny_zone_app/presentation/constants/string.dart';
 import 'package:youtube_video_info/youtube_video_info.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -56,6 +57,8 @@ class _ViewVideoState extends State<ViewVideo> {
   @override
   void dispose() {
     _controller.dispose();
+    _controller.removeListener(() {});
+    _controller.reset();
 
     super.dispose();
   }
@@ -199,7 +202,13 @@ class _ViewVideoState extends State<ViewVideo> {
                                           color: AppColor.white),
                                 ),
                                 TextButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                        context, AppString.searchroute,
+                                        arguments: mostviewsVideos);
+
+                                    _controller.pause();
+                                  },
                                   child: Text(
                                     "See All",
                                     style: Theme.of(context)
@@ -271,16 +280,19 @@ class TileBar extends StatelessWidget {
             },
           ),
         ),
-        trailing: FloatingActionButton(
-          mini: true,
-          onPressed: () {},
-          backgroundColor: AppColor.black,
-          child: const Icon(
-            Icons.favorite_outline,
-            color: AppColor.gold,
-            size: 24.0,
-          ),
+        trailing: const SizedBox(
+          width: 10.0,
         ),
+        // trailing: FloatingActionButton(
+        //   mini: true,
+        //   onPressed: () {},
+        //   backgroundColor: AppColor.black,
+        //   child: const Icon(
+        //     Icons.share_outlined,
+        //     color: AppColor.gold,
+        //     size: 24.0,
+        //   ),
+        // ),
         title: Text(
           videoInfo.title ?? "Title Not Loaded",
           maxLines: 2,
@@ -305,9 +317,12 @@ class TileBar extends StatelessWidget {
                 width: 5.0,
               ),
               const Icon(
-                Icons.favorite,
+                Icons.remove_red_eye_outlined,
                 color: AppColor.gold,
                 size: 16.0,
+              ),
+              const SizedBox(
+                width: 3.0,
               ),
               Text(
                 videoInfo.viewCount.toString(),
@@ -502,16 +517,6 @@ class _HorizontalVideosState extends State<HorizontalVideos> {
                     fontSize: 14.0,
                     color: AppColor.white),
               ),
-              TextButton(
-                onPressed: () {},
-                child: Text(
-                  "See All",
-                  style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                      fontWeight: FontWeight.normal,
-                      fontSize: 13.0,
-                      color: AppColor.gold),
-                ),
-              )
             ],
           ),
           // const SizedBox(

@@ -10,6 +10,7 @@ class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      width: MediaQuery.of(context).size.width,
       // shape: const RoundedRectangleBorder(
       //     borderRadius: BorderRadius.only(
       //         topRight: Radius.circular(25.0),
@@ -44,16 +45,6 @@ class AppDrawer extends StatelessWidget {
           ),
           const SizedBox(
             height: 10.0,
-          ),
-          DrawerItem(
-            icon: Icons.search_outlined,
-            tap: () {},
-            title: "Search",
-          ),
-          DrawerItem(
-            icon: Icons.favorite_outline,
-            tap: () {},
-            title: "Favorite",
           ),
           DrawerItem(
             icon: Icons.notifications_outlined,

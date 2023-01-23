@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:funny_zone_app/domain/entities/sener.dart';
+import 'package:funny_zone_app/domain/entities/video_entity.dart';
 import 'package:funny_zone_app/presentation/constants/string.dart';
 import 'package:funny_zone_app/presentation/pages/favorite/favorite.dart';
 import 'package:funny_zone_app/presentation/pages/home/home.dart';
 import 'package:funny_zone_app/presentation/pages/search/search.dart';
+import 'package:funny_zone_app/presentation/pages/splash/splash.dart';
 import 'package:funny_zone_app/presentation/pages/view_video/view_video.dart';
 
 class AppRoute {
@@ -12,7 +14,7 @@ class AppRoute {
 
     switch (settings.name) {
       case AppString.initialroute:
-        return _pageRoute(const HomePage());
+        return _pageRoute(const SplashPage());
       case AppString.homeroute:
         return _pageRoute(const HomePage());
       case AppString.viewvideo:
@@ -23,7 +25,10 @@ class AppRoute {
       case AppString.favoriteroute:
         return _pageRoute(const FavoritePage());
       case AppString.searchroute:
-        return _pageRoute(const SearchPage());
+        var videos = arg as List<VideoEntity>;
+        return _pageRoute(SearchPage(
+          videos: videos,
+        ));
       default:
         return _pageRoute(const ErrorRoutePage());
     }
