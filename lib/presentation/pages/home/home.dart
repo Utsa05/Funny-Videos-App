@@ -1,5 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
 
+import 'dart:math';
+
 import 'package:funny_zone_app/domain/entities/sener.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -154,6 +157,8 @@ class AllViews extends StatelessWidget {
   final List<VideoEntity> videos;
   @override
   Widget build(BuildContext context) {
+    final random = Random();
+
     List<VideoEntity> getCategorybyVideo(String category) {
       List<VideoEntity> list = [];
       for (var video in videos) {
@@ -169,6 +174,11 @@ class AllViews extends StatelessWidget {
     List<VideoEntity> hotVideos = getCategorybyVideo("Hot");
     List<VideoEntity> mostviewsVideos = getCategorybyVideo("Most viewed");
     List<VideoEntity> trandingVideos = getCategorybyVideo("Tranding");
+    recentVideos.shuffle(random);
+    popularVideos.shuffle(random);
+    mostviewsVideos.shuffle(random);
+    mostviewsVideos.shuffle(random);
+    trandingVideos.shuffle(random);
     return TabBarView(physics: const NeverScrollableScrollPhysics(), children: [
       CustomScrollView(
         slivers: [
@@ -185,9 +195,9 @@ class AllViews extends StatelessWidget {
                 crossAxisSpacing: 10.0),
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                String id =
-                    YoutubePlayer.convertUrlToId(videos[index].videoLink)
-                        .toString();
+                var videoItem = videos[random.nextInt(videos.length)];
+                String? id = YoutubePlayer.convertUrlToId(
+                    videoItem.videoLink.toString());
 
                 return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
@@ -215,8 +225,8 @@ class AllViews extends StatelessWidget {
                                     context, AppString.viewvideo,
                                     arguments: SenderEnity(
                                         videos: videos,
-                                        url: videos[index].videoLink,
-                                        category: videos[index].category));
+                                        url: videoItem.videoLink,
+                                        category: videoItem.category));
                               }),
                               child: Stack(
                                 children: [
@@ -291,6 +301,7 @@ class TopVideos extends StatelessWidget {
   final List<VideoEntity> videos;
   @override
   Widget build(BuildContext context) {
+    final random = Random();
     // Future<VideoData?> results;
 
     // void getData()  {
@@ -304,8 +315,8 @@ class TopVideos extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: List.generate(10, (index) {
-          String id =
-              YoutubePlayer.convertUrlToId(videos[index].videoLink).toString();
+          var item = videos[random.nextInt(videos.length)];
+          String id = YoutubePlayer.convertUrlToId(item.videoLink).toString();
 
           return Container(
               decoration: BoxDecoration(
@@ -335,8 +346,8 @@ class TopVideos extends StatelessWidget {
                         Navigator.pushNamed(context, AppString.viewvideo,
                             arguments: SenderEnity(
                                 videos: videos,
-                                url: videos[index].videoLink,
-                                category: videos[index].category));
+                                url: item.videoLink,
+                                category: item.category));
                       }),
                       child: Center(
                         child: Container(

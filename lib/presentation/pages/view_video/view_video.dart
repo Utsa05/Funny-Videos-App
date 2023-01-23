@@ -1,5 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages, avoid_print
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:funny_zone_app/domain/entities/sener.dart';
 import 'package:funny_zone_app/domain/entities/video_entity.dart';
@@ -77,8 +79,18 @@ class _ViewVideoState extends State<ViewVideo> {
 
     List<VideoEntity> reletedVideos =
         getCategorybyVideo(widget.senderEnity.category);
-    List<VideoEntity> mostviewsVideos = getCategorybyVideo("Most viewed");
+    List<VideoEntity> mostviewsVideos = [];
+    switch (widget.senderEnity.category) {
+      case 'Most viewed':
+        mostviewsVideos = getCategorybyVideo("Hot");
+        break;
+      default:
+        mostviewsVideos = getCategorybyVideo("Most viewed");
+    }
     List<VideoEntity> trandingVideos = getCategorybyVideo("Tranding");
+    reletedVideos.shuffle(Random());
+    mostviewsVideos.shuffle(Random());
+    trandingVideos.shuffle(Random());
     return Scaffold(
         key: key,
 
@@ -142,24 +154,31 @@ class _ViewVideoState extends State<ViewVideo> {
                                   child: CircularProgressIndicator(),
                                 ),
                               ),
-                        const SliverToBoxAdapter(
-                          child: SizedBox(
-                            height: 15.0,
-                          ),
-                        ),
+                        // SliverToBoxAdapter(
+                        //   child: SizedBox(
+                        //     height: 15.0,
+                        //     child: MaterialButton(
+                        //         color: AppColor.white,
+                        //         onPressed: () {
+                        //           reletedVideos = getCategorybyVideo("Hot");
+                        //           setState(() {});
+                        //         }),
+                        //   ),
+                        // ),
                         SliverToBoxAdapter(
                           child: HorizontalVideos(
                               fun: getVideoInfo,
                               youtubePlayerController: _controller,
                               title: "Releted",
-                              videos: reletedVideos),
+                              // reletedFun:reletedVideos(),
+                              horizontalVideos: reletedVideos),
                         ),
                         SliverToBoxAdapter(
                           child: HorizontalVideos(
                             fun: getVideoInfo,
                             youtubePlayerController: _controller,
                             title: "Trending",
-                            videos: trandingVideos,
+                            horizontalVideos: trandingVideos,
                           ),
                         ),
                         SliverToBoxAdapter(
@@ -222,7 +241,7 @@ class TileBar extends StatelessWidget {
     return SliverAppBar(
       automaticallyImplyLeading: false,
       floating: true,
-      toolbarHeight: 30.0,
+      toolbarHeight: 35.0,
       expandedHeight: 42,
       //backgroundColor: AppColor.white,
       centerTitle: true,
@@ -291,7 +310,7 @@ class TileBar extends StatelessWidget {
                 size: 16.0,
               ),
               Text(
-                "10",
+                videoInfo.viewCount.toString(),
                 style: Theme.of(context).textTheme.bodyText2!.copyWith(
                     fontWeight: FontWeight.normal,
                     fontSize: 14.0,
@@ -427,21 +446,46 @@ class PopularGrid extends StatelessWidget {
   }
 }
 
-class HorizontalVideos extends StatelessWidget {
+class HorizontalVideos extends StatefulWidget {
   const HorizontalVideos({
     Key? key,
     required this.title,
-    required this.videos,
+    required this.horizontalVideos,
     required this.youtubePlayerController,
     required this.fun,
+    this.reletedFun,
   }) : super(key: key);
   final String title;
-  final List<VideoEntity> videos;
+  final List<VideoEntity> horizontalVideos;
   final YoutubePlayerController youtubePlayerController;
   final Function fun;
+  final Function? reletedFun;
 
   @override
+  State<HorizontalVideos> createState() => _HorizontalVideosState();
+}
+
+class _HorizontalVideosState extends State<HorizontalVideos> {
+  @override
   Widget build(BuildContext context) {
+    List<VideoEntity> videos = widget.horizontalVideos;
+    // List<VideoEntity> getCategorybyVideo(String category) {
+    //   List<VideoEntity> list = [];
+    //   for (var video in widget.horizontalVideos) {
+    //     if (video.category.toLowerCase().toString() == category.toLowerCase()) {
+    //       list.add(video);
+    //     }
+    //   }
+    //   return list;
+    // }
+
+    // setVideos(String category) {
+    //   videos = getCategorybyVideo(category);
+
+    //   print(category);
+    //   setState(() {});
+    // }
+
     return Container(
       padding: const EdgeInsets.only(left: 4.0, right: 4.0),
       width: MediaQuery.of(context).size.width,
@@ -452,7 +496,7 @@ class HorizontalVideos extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                title,
+                widget.title,
                 style: Theme.of(context).textTheme.bodyText2!.copyWith(
                     fontWeight: FontWeight.normal,
                     fontSize: 14.0,
@@ -478,7 +522,7 @@ class HorizontalVideos extends StatelessWidget {
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: List.generate(10, (index) {
+                children: List.generate(videos.length > 20 ? 20 : 10, (index) {
                   String id =
                       YoutubePlayer.convertUrlToId(videos[index].videoLink)
                           .toString();
@@ -505,8 +549,11 @@ class HorizontalVideos extends StatelessWidget {
                               borderRadius: BorderRadius.circular(6.0),
                               onTap: (() {
                                 //load videos
-                                fun.call(videos[index].videoLink);
-                                youtubePlayerController.load(id);
+                                widget.fun.call(videos[index].videoLink);
+
+                                widget.youtubePlayerController.load(id);
+                                // setVideos(widget
+                                //     .horizontalVideos[index].category);
                               }),
                               child: Center(
                                 child: Container(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:funny_zone_app/on_generate_route.dart';
 import 'package:funny_zone_app/presentation/constants/color.dart';
 import 'package:funny_zone_app/presentation/constants/string.dart';
+import 'package:funny_zone_app/presentation/cubits/releted/releted_cubit.dart';
 import 'package:funny_zone_app/presentation/cubits/video/video_cubit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,6 +34,9 @@ class _VideoAppState extends State<VideoApp> {
       providers: [
         BlocProvider(
           create: (context) => di.sl<VideoCubit>()..getVideos(),
+        ),
+        BlocProvider(
+          create: (context) => ReletedCubit(),
         )
       ],
       child: MaterialApp(
