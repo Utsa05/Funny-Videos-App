@@ -1,6 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
 
 import 'package:flutter/material.dart';
+import 'package:funny_zone_app/domain/entities/appinfo.dart';
 import 'package:funny_zone_app/domain/entities/sener.dart';
 import 'package:funny_zone_app/domain/entities/video_entity.dart';
 import 'package:funny_zone_app/presentation/constants/color.dart';
@@ -14,11 +15,13 @@ class VideoGrid extends StatelessWidget {
     this.isToFavorite,
     required this.videos,
     required this.allvideos,
+    required this.info,
   }) : super(key: key);
 
   final bool? isToFavorite;
   final List<VideoEntity> videos;
   final List<VideoEntity> allvideos;
+  final AppInfoEntity info;
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +41,7 @@ class VideoGrid extends StatelessWidget {
                 tap: () {
                   Navigator.pushNamed(context, AppString.viewvideo,
                       arguments: SenderEnity(
+                          info: info,
                           videos: allvideos,
                           url: videos[index].videoLink,
                           category: videos[index].category));

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:funny_zone_app/domain/entities/sener.dart';
-import 'package:funny_zone_app/domain/entities/video_entity.dart';
 import 'package:funny_zone_app/presentation/constants/string.dart';
-import 'package:funny_zone_app/presentation/pages/favorite/favorite.dart';
 import 'package:funny_zone_app/presentation/pages/home/home.dart';
 import 'package:funny_zone_app/presentation/pages/notification/notiification.dart';
 import 'package:funny_zone_app/presentation/pages/search/search.dart';
@@ -23,14 +21,14 @@ class AppRoute {
         return _pageRoute(ViewVideo(
           senderEnity: argValue,
         ));
-      case AppString.favoriteroute:
-        return _pageRoute(const FavoritePage());
+      // case AppString.favoriteroute:
+      //   return _pageRoute(const FavoritePage());
       case AppString.notificationRoute:
         return _pageRoute(const NotificationPage());
       case AppString.searchroute:
-        var videos = arg as List<VideoEntity>;
+        var sender = arg as SenderEnity;
         return _pageRoute(SearchPage(
-          videos: videos,
+          sender: sender,
         ));
       default:
         return _pageRoute(const ErrorRoutePage());

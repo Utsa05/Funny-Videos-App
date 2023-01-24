@@ -40,7 +40,8 @@ class _HomePageState extends State<HomePage> {
                   return Scaffold(
                     key: _scaffoldKey,
                     drawer: AppDrawer(info: infostate.appInfoModel),
-                    appBar: homeAppbar(context, state.videos),
+                    appBar: homeAppbar(
+                        context, state.videos, infostate.appInfoModel),
                     body: AllViews(
                         videos: state.videos, info: infostate.appInfoModel),
                   );
@@ -72,7 +73,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  AppBar homeAppbar(BuildContext context, List<VideoEntity> videos) {
+  AppBar homeAppbar(
+      BuildContext context, List<VideoEntity> videos, AppInfoEntity info) {
     return AppBar(
       leadingWidth: 0,
       iconTheme: const IconThemeData(color: AppColor.gold, size: 0.0),
@@ -86,24 +88,26 @@ class _HomePageState extends State<HomePage> {
             width: 160.0,
           )),
       actions: [
-        Padding(
-          padding: const EdgeInsets.only(
-            top: 3.0,
-            bottom: 4.0,
-          ),
-          child: IconButton(
-            splashRadius: 20,
-            onPressed: () {
-              Navigator.pushNamed(context, AppString.searchroute,
-                  arguments: videos);
-            },
-            icon: const Icon(
-              Icons.search_outlined,
-              size: 25.0,
-              color: AppColor.white,
-            ),
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.only(
+        //     top: 3.0,
+        //     bottom: 4.0,
+        //   ),
+        //   child: IconButton(
+        //     splashRadius: 20,
+        //     onPressed: () {
+        //       SenderEnity senderEnity = SenderEnity(
+        //           info: info, videos: videos, url: '', category: '');
+        //       Navigator.pushNamed(context, AppString.searchroute,
+        //           arguments: senderEnity);
+        //     },
+        //     icon: const Icon(
+        //       Icons.search_outlined,
+        //       size: 25.0,
+        //       color: AppColor.white,
+        //     ),
+        //   ),
+        // ),
         Padding(
           padding: const EdgeInsets.only(
             top: 3.0,
@@ -186,7 +190,9 @@ class _AllViewsState extends State<AllViews> {
 
   @override
   void initState() {
-    _loadBannerAd("ca-app-pub-3940256099942544/6300978111");
+    if (widget.info.addstatus!.toLowerCase() == "on") {
+      _loadBannerAd(widget.info.bannerad!);
+    }
     super.initState();
   }
 
@@ -249,7 +255,7 @@ class _AllViewsState extends State<AllViews> {
                 child: Padding(
               padding:
                   const EdgeInsets.only(left: 5.0, right: 5.0, bottom: 10.0),
-              child: TopVideos(videos: hotVideos),
+              child: TopVideos(videos: hotVideos, info: widget.info),
             )),
             // SliverToBoxAdapter(
             //   child: _isBannerAdReady
@@ -304,6 +310,7 @@ class _AllViewsState extends State<AllViews> {
                                         Navigator.pushNamed(
                                             context, AppString.viewvideo,
                                             arguments: SenderEnity(
+                                                info: widget.info,
                                                 videos: widget.videos,
                                                 url: videoItem.videoLink,
                                                 category: videoItem.category));
@@ -386,11 +393,18 @@ class _AllViewsState extends State<AllViews> {
       VideoGrid(
         videos: recentVideos,
         allvideos: widget.videos,
+        info: widget.info,
       ),
-      VideoGrid(videos: mostviewsVideos, allvideos: widget.videos),
-      VideoGrid(videos: trandingVideos, allvideos: widget.videos),
-      VideoGrid(videos: popularVideos, allvideos: widget.videos),
-      VideoGrid(videos: hotVideos, allvideos: widget.videos),
+      VideoGrid(
+        videos: mostviewsVideos,
+        allvideos: widget.videos,
+        info: widget.info,
+      ),
+      VideoGrid(
+          videos: trandingVideos, allvideos: widget.videos, info: widget.info),
+      VideoGrid(
+          videos: popularVideos, allvideos: widget.videos, info: widget.info),
+      VideoGrid(videos: hotVideos, allvideos: widget.videos, info: widget.info),
     ]);
   }
 }
@@ -399,8 +413,10 @@ class TopVideos extends StatelessWidget {
   const TopVideos({
     Key? key,
     required this.videos,
+    required this.info,
   }) : super(key: key);
   final List<VideoEntity> videos;
+  final AppInfoEntity info;
   @override
   Widget build(BuildContext context) {
     final random = Random();
@@ -447,6 +463,7 @@ class TopVideos extends StatelessWidget {
                       onTap: (() {
                         Navigator.pushNamed(context, AppString.viewvideo,
                             arguments: SenderEnity(
+                                info: info,
                                 videos: videos,
                                 url: item.videoLink,
                                 category: item.category));

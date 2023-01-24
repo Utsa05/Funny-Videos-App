@@ -1,6 +1,7 @@
-// ignore_for_file: depend_on_referenced_packages, avoid_print
+// ignore_for_file: depend_on_referenced_packages, avoid_print, unused_import
 
 import 'dart:math';
+import 'package:share_plus/share_plus.dart';
 
 import 'package:flutter/material.dart';
 import 'package:funny_zone_app/domain/entities/sener.dart';
@@ -9,8 +10,9 @@ import 'package:funny_zone_app/presentation/constants/color.dart';
 import 'package:funny_zone_app/presentation/constants/string.dart';
 import 'package:youtube_video_info/youtube_video_info.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ViewVideo extends StatefulWidget {
   const ViewVideo({super.key, required this.senderEnity});
@@ -37,12 +39,15 @@ class _ViewVideoState extends State<ViewVideo> {
           showLiveFullscreenButton: true),
     );
     getVideoInfo(widget.senderEnity.url);
-
+    if (widget.senderEnity.info.addstatus!.toLowerCase() == "on") {
+      _createInterstitialAd(widget.senderEnity.info.interstitialad!);
+    }
     super.initState();
   }
 
   bool isForinfinitytime = false;
   int numofitemClick = 0;
+  InterstitialAd? _interstitialAd;
 
   getVideoInfo(String url) async {
     isVideoInfoLoading = true;
@@ -55,12 +60,49 @@ class _ViewVideoState extends State<ViewVideo> {
     setState(() {});
   }
 
+  void _createInterstitialAd(String id) {
+    InterstitialAd.load(
+        adUnitId: id,
+        request: const AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (InterstitialAd ad) {
+            print('$ad loaded');
+            _interstitialAd = ad;
+
+            _interstitialAd!.setImmersiveMode(true);
+          },
+          onAdFailedToLoad: (LoadAdError error) {},
+        ));
+  }
+
+  void _showInterstitialAd() {
+    if (_interstitialAd == null) {
+      print('Warning: attempt to show interstitial before loaded.');
+      return;
+    }
+    _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+      onAdShowedFullScreenContent: (InterstitialAd ad) =>
+          print('ad onAdShowedFullScreenContent.'),
+      onAdDismissedFullScreenContent: (InterstitialAd ad) {
+        print('$ad onAdDismissedFullScreenContent.');
+        ad.dispose();
+        // _createInterstitialAd();
+      },
+      onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+        print('$ad onAdFailedToShowFullScreenContent: $error');
+        ad.dispose();
+        // _createInterstitialAd();
+      },
+    );
+    _interstitialAd!.show();
+    _interstitialAd = null;
+  }
+
   @override
   void dispose() {
     _controller.dispose();
     _controller.removeListener(() {});
     _controller.reset();
-
     super.dispose();
   }
 
@@ -72,6 +114,7 @@ class _ViewVideoState extends State<ViewVideo> {
     if (numofitemClick <= 5) {
       numofitemClick++;
     } else {
+      _showInterstitialAd();
       numofitemClick = 0;
     }
     print(numofitemClick);
@@ -267,6 +310,7 @@ class TileBar extends StatelessWidget {
     required this.videoInfo,
   }) : super(key: key);
   final YoutubeDataModel videoInfo;
+
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
@@ -357,7 +401,11 @@ class TileBar extends StatelessWidget {
                 width: 5.0,
               ),
               InkWell(
-                onTap: (() {}),
+                onTap: (() {
+                  Share.share(
+                      'This video shared from Funny Video App\n${videoInfo.url}\navailale on Google Playstore',
+                      subject: "Share Now");
+                }),
                 child: Row(
                   children: [
                     const Icon(

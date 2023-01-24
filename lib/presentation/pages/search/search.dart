@@ -2,13 +2,14 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:funny_zone_app/domain/entities/sener.dart';
 import 'package:funny_zone_app/domain/entities/video_entity.dart';
 import 'package:funny_zone_app/presentation/constants/color.dart';
 import 'package:funny_zone_app/presentation/widgets/video_grid.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({Key? key, required this.videos}) : super(key: key);
-  final List<VideoEntity> videos;
+  const SearchPage({Key? key, required this.sender}) : super(key: key);
+  final SenderEnity sender;
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -18,14 +19,14 @@ class _SearchPageState extends State<SearchPage> {
   List<VideoEntity> search = [];
   @override
   void initState() {
-    search = widget.videos;
+    search = widget.sender.videos;
     search.shuffle(Random());
     super.initState();
   }
 
   List<VideoEntity> getCategorybyVideo(String value) {
     List<VideoEntity> list = [];
-    for (var video in widget.videos) {
+    for (var video in widget.sender.videos) {
       if (video.category
           .toLowerCase()
           .toString()
@@ -52,7 +53,7 @@ class _SearchPageState extends State<SearchPage> {
                 search = getCategorybyVideo(value);
                 //search.shuffle(Random());
               } else {
-                search = widget.videos;
+                search = widget.sender.videos;
               }
               setState(() {});
             },
@@ -61,6 +62,7 @@ class _SearchPageState extends State<SearchPage> {
           //backgroundColor: AppColor.white.withOpacity(0.1),
           ),
       body: VideoGrid(
+        info: widget.sender.info,
         videos: search,
         allvideos: search,
       ),
