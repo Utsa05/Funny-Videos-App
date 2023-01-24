@@ -4,6 +4,7 @@ import 'package:funny_zone_app/domain/entities/video_entity.dart';
 import 'package:funny_zone_app/presentation/constants/string.dart';
 import 'package:funny_zone_app/presentation/pages/favorite/favorite.dart';
 import 'package:funny_zone_app/presentation/pages/home/home.dart';
+import 'package:funny_zone_app/presentation/pages/notification/notiification.dart';
 import 'package:funny_zone_app/presentation/pages/search/search.dart';
 import 'package:funny_zone_app/presentation/pages/splash/splash.dart';
 import 'package:funny_zone_app/presentation/pages/view_video/view_video.dart';
@@ -24,6 +25,8 @@ class AppRoute {
         ));
       case AppString.favoriteroute:
         return _pageRoute(const FavoritePage());
+      case AppString.notificationRoute:
+        return _pageRoute(const NotificationPage());
       case AppString.searchroute:
         var videos = arg as List<VideoEntity>;
         return _pageRoute(SearchPage(

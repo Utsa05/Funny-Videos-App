@@ -10,4 +10,5 @@ class AppString {
   static const String searchroute = "/search";
   static const String viewvideo = "/viewvideo";
   static const String seeallvideo = "/seeallvideo";
+  static const String notificationRoute = "/notification";
 }

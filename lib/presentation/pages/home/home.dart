@@ -2,7 +2,9 @@
 
 import 'dart:math';
 
+import 'package:funny_zone_app/domain/entities/appinfo.dart';
 import 'package:funny_zone_app/domain/entities/sener.dart';
+import 'package:funny_zone_app/presentation/cubits/appinfo/appinfo_cubit.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:funny_zone_app/domain/entities/video_entity.dart';
@@ -13,6 +15,7 @@ import 'package:funny_zone_app/presentation/cubits/video/video_cubit.dart';
 import 'package:funny_zone_app/presentation/pages/home/utils/app_drawer.dart';
 import 'package:funny_zone_app/presentation/widgets/video_grid.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -31,11 +34,23 @@ class _HomePageState extends State<HomePage> {
       child: BlocBuilder<VideoCubit, VideoState>(
         builder: (context, state) {
           if (state is VideoLoaded) {
-            return Scaffold(
-              key: _scaffoldKey,
-              drawer: const AppDrawer(),
-              appBar: homeAppbar(context, state.videos),
-              body: AllViews(videos: state.videos),
+            return BlocBuilder<AppinfoCubit, AppinfoState>(
+              builder: (context, infostate) {
+                if (infostate is AppinfoLoaded) {
+                  return Scaffold(
+                    key: _scaffoldKey,
+                    drawer: AppDrawer(info: infostate.appInfoModel),
+                    appBar: homeAppbar(context, state.videos),
+                    body: AllViews(
+                        videos: state.videos, info: infostate.appInfoModel),
+                  );
+                }
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: AppColor.gold,
+                  ),
+                );
+              },
             );
           } else if (state is VideoNoInternet) {
             return const Center(
@@ -47,7 +62,9 @@ class _HomePageState extends State<HomePage> {
             );
           } else {
             return const Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                color: AppColor.gold,
+              ),
             );
           }
         },
@@ -87,23 +104,23 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-        // Padding(
-        //   padding: const EdgeInsets.only(
-        //     top: 3.0,
-        //     bottom: 4.0,
-        //   ),
-        //   child: IconButton(
-        //     splashRadius: 20,
-        //     onPressed: () {
-        //       Navigator.pushNamed(context, AppString.favoriteroute);
-        //     },
-        //     icon: const Icon(
-        //       Icons.favorite_outline,
-        //       size: 25.0,
-        //       color: AppColor.white,
-        //     ),
-        //   ),
-        // ),
+        Padding(
+          padding: const EdgeInsets.only(
+            top: 3.0,
+            bottom: 4.0,
+          ),
+          child: IconButton(
+            splashRadius: 20,
+            onPressed: () {
+              Navigator.pushNamed(context, AppString.notificationRoute);
+            },
+            icon: const Icon(
+              Icons.notifications_outlined,
+              size: 25.0,
+              color: AppColor.white,
+            ),
+          ),
+        ),
         Padding(
             padding: const EdgeInsets.only(
               right: 10.0,
@@ -154,14 +171,46 @@ class AllViews extends StatefulWidget {
   const AllViews({
     super.key,
     required this.videos,
+    required this.info,
   });
   final List<VideoEntity> videos;
+  final AppInfoEntity info;
 
   @override
   State<AllViews> createState() => _AllViewsState();
 }
 
 class _AllViewsState extends State<AllViews> {
+  late BannerAd _bannerAd;
+  bool _isBannerAdReady = false;
+
+  @override
+  void initState() {
+    _loadBannerAd("ca-app-pub-3940256099942544/6300978111");
+    super.initState();
+  }
+
+  void _loadBannerAd(String adId) {
+    _bannerAd = BannerAd(
+      adUnitId: adId,
+      request: const AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (_) {
+          setState(() {
+            _isBannerAdReady = true;
+          });
+        },
+        onAdFailedToLoad: (ad, err) {
+          _isBannerAdReady = false;
+          ad.dispose();
+        },
+      ),
+    );
+
+    _bannerAd.load();
+  }
+
   @override
   Widget build(BuildContext context) {
     final random = Random();
@@ -202,6 +251,18 @@ class _AllViewsState extends State<AllViews> {
                   const EdgeInsets.only(left: 5.0, right: 5.0, bottom: 10.0),
               child: TopVideos(videos: hotVideos),
             )),
+            // SliverToBoxAdapter(
+            //   child: _isBannerAdReady
+            //       ? Align(
+            //           alignment: Alignment.bottomCenter,
+            //           child: SizedBox(
+            //             width: _bannerAd.size.width.toDouble(),
+            //             height: _bannerAd.size.height.toDouble(),
+            //             child: AdWidget(ad: _bannerAd),
+            //           ),
+            //         )
+            //       : const SizedBox(),
+            // ),
             SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 1,
@@ -217,79 +278,103 @@ class _AllViewsState extends State<AllViews> {
 
                   return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      child: CachedNetworkImage(
-                        imageUrl: 'https://img.youtube.com/vi/$id/0.jpg',
-                        placeholder: (context, url) => const Center(
-                            child: Padding(
-                          padding: EdgeInsets.all(15.0),
-                          child: CircularProgressIndicator(
-                            color: AppColor.gold,
-                          ),
-                        )),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
-                        imageBuilder: (context, imageProvider) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(10.0),
-                            child: Ink.image(
-                              image: imageProvider,
-                              fit: BoxFit.cover,
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(6.0),
-                                onTap: (() {
-                                  Navigator.pushNamed(
-                                      context, AppString.viewvideo,
-                                      arguments: SenderEnity(
-                                          videos: widget.videos,
-                                          url: videoItem.videoLink,
-                                          category: videoItem.category));
-                                }),
-                                child: Stack(
-                                  children: [
-                                    Center(
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8.0,
-                                        ),
-                                        decoration: BoxDecoration(
-                                            color:
-                                                AppColor.black.withOpacity(0.4),
-                                            borderRadius:
-                                                BorderRadius.circular(5.0)),
-                                        child: const Icon(
-                                          Icons.play_arrow,
-                                          color: AppColor.white,
-                                          size: 35,
-                                        ),
-                                      ),
-                                    ),
-                                    Align(
-                                      alignment: Alignment.bottomCenter,
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 7.0),
-                                        width: double.infinity,
-                                        color: AppColor.black.withOpacity(0.4),
-                                        child: Text(
-                                          "Play Now",
-                                          overflow: TextOverflow.ellipsis,
-                                          textAlign: TextAlign.center,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyText2!
-                                              .copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 15.0,
-                                                  color: AppColor.white),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: CachedNetworkImage(
+                              imageUrl: 'https://img.youtube.com/vi/$id/0.jpg',
+                              placeholder: (context, url) => const Center(
+                                  child: Padding(
+                                padding: EdgeInsets.all(15.0),
+                                child: CircularProgressIndicator(
+                                  color: AppColor.gold,
                                 ),
-                              ),
+                              )),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.error),
+                              imageBuilder: (context, imageProvider) {
+                                return ClipRRect(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  child: Ink.image(
+                                    image: imageProvider,
+                                    fit: BoxFit.cover,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(6.0),
+                                      onTap: (() {
+                                        Navigator.pushNamed(
+                                            context, AppString.viewvideo,
+                                            arguments: SenderEnity(
+                                                videos: widget.videos,
+                                                url: videoItem.videoLink,
+                                                category: videoItem.category));
+                                      }),
+                                      child: Stack(
+                                        children: [
+                                          Center(
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 8.0,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                  color: AppColor.black
+                                                      .withOpacity(0.4),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          5.0)),
+                                              child: const Icon(
+                                                Icons.play_arrow,
+                                                color: AppColor.white,
+                                                size: 35,
+                                              ),
+                                            ),
+                                          ),
+                                          Align(
+                                            alignment: Alignment.bottomCenter,
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 7.0),
+                                              width: double.infinity,
+                                              color: AppColor.black
+                                                  .withOpacity(0.4),
+                                              child: Text(
+                                                "Play Now",
+                                                overflow: TextOverflow.ellipsis,
+                                                textAlign: TextAlign.center,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyText2!
+                                                    .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 15.0,
+                                                        color: AppColor.white),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        },
+                          ),
+                          index == 3
+                              ? _isBannerAdReady
+                                  ? Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: SizedBox(
+                                        width: _bannerAd.size.width.toDouble(),
+                                        height:
+                                            _bannerAd.size.height.toDouble(),
+                                        child: AdWidget(ad: _bannerAd),
+                                      ),
+                                    )
+                                  : const SizedBox()
+                              : const SizedBox()
+                        ],
                       ));
                 },
                 childCount: widget.videos.length,

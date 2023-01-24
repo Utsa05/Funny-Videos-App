@@ -99,6 +99,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.16.0"
+  cross_file:
+    dependency: transitive
+    description:
+      name: cross_file
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.3+2"
   crypto:
     dependency: transitive
     description:
@@ -240,6 +247,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.1"
+  google_mobile_ads:
+    dependency: "direct dev"
+    description:
+      name: google_mobile_ads
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.3.0"
   html:
     dependency: transitive
     description:
@@ -261,6 +275,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.2"
+  intl:
+    dependency: "direct dev"
+    description:
+      name: intl
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.18.0"
   js:
     dependency: transitive
     description:
@@ -296,6 +317,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.8.0"
+  mime:
+    dependency: transitive
+    description:
+      name: mime
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.4"
   nested:
     dependency: transitive
     description:
@@ -408,6 +436,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.27.7"
+  share_plus:
+    dependency: "direct dev"
+    description:
+      name: share_plus
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "6.3.0"
+  share_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: share_plus_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.2.0"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -553,6 +595,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.2"
+  visibility_detector:
+    dependency: transitive
+    description:
+      name: visibility_detector
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.3"
   webview_flutter:
     dependency: transitive
     description:

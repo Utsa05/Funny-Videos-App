@@ -65,13 +65,17 @@ class FirebaseRemoteDatasourceImpl implements FirebaseRemoteDatasource {
   @override
   Future<AppInfoModel> getAppInfo() async {
     final collection =
-        firebaseFiresore.collection("appinfo").doc('WTmNxTYT7WDpzsTcijIX');
+        firebaseFiresore.collection("appinfo").doc('uZO7WggUaBUDnR0Jy2xM');
 
     return collection.get().then((value) {
       if (value.exists) {
-        print(value.get('addstatus'));
+        print(value.get('adstatus'));
+        print(value.get('othersapp'));
+        print(value.get('policy'));
+        print(value.get('videoad'));
+        print(value.get('interstitialad'));
         return AppInfoModel(
-          addstatus: value.get('addstatus'),
+          addstatus: value.get('adstatus'),
           shareapp: value.get('shareapp'),
           othersapp: value.get('othersapp'),
           bannerad: value.get('bannerad'),

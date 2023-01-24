@@ -23,7 +23,7 @@ class AppInfoModel extends AppInfoEntity {
 
   factory AppInfoModel.fromSnapshot(DocumentSnapshot snapshot) {
     return AppInfoModel(
-        addstatus: snapshot.get('addstatus'),
+        addstatus: snapshot.get('adstatus'),
         bannerad: snapshot.get('bannerad'),
         interstitialad: snapshot.get('interstitialad'),
         videoad: snapshot.get('videoad'),
@@ -34,7 +34,7 @@ class AppInfoModel extends AppInfoEntity {
 
   Map<String, dynamic> toDocument() {
     return {
-      'addstatus': addstatus,
+      'adstatus': addstatus,
       'bannerad': bannerad,
       'interstitialad': interstitialad,
       'videoad': videoad,

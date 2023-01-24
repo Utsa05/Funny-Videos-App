@@ -9,6 +9,8 @@ import 'package:funny_zone_app/presentation/cubits/video/video_cubit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'di.dart' as di;
+import 'presentation/cubits/appinfo/appinfo_cubit.dart';
+import 'presentation/cubits/notification/notification_cubit.dart';
 
 class VideoApp extends StatefulWidget {
   const VideoApp({Key? key}) : super(key: key);
@@ -34,6 +36,12 @@ class _VideoAppState extends State<VideoApp> {
       providers: [
         BlocProvider(
           create: (context) => di.sl<VideoCubit>()..getVideos(),
+        ),
+        BlocProvider(
+          create: (context) => di.sl<AppinfoCubit>()..getAppInfo(),
+        ),
+        BlocProvider(
+          create: (context) => di.sl<NotificationCubit>()..getNotification(),
         ),
         BlocProvider(
           create: (context) => ReletedCubit(),

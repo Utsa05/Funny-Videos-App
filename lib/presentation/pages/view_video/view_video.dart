@@ -42,6 +42,7 @@ class _ViewVideoState extends State<ViewVideo> {
   }
 
   bool isForinfinitytime = false;
+  int numofitemClick = 0;
 
   getVideoInfo(String url) async {
     isVideoInfoLoading = true;
@@ -67,6 +68,16 @@ class _ViewVideoState extends State<ViewVideo> {
   //               "https://youtu.be/k6eyzRda9zU?list=RDMMcZZDrkPmvKc")
   //           .toString());
   bool isFullScreen = false;
+  void counterFun() {
+    if (numofitemClick <= 5) {
+      numofitemClick++;
+    } else {
+      numofitemClick = 0;
+    }
+    print(numofitemClick);
+
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -154,7 +165,9 @@ class _ViewVideoState extends State<ViewVideo> {
                               )
                             : const SliverToBoxAdapter(
                                 child: Center(
-                                  child: CircularProgressIndicator(),
+                                  child: CircularProgressIndicator(
+                                    color: AppColor.gold,
+                                  ),
                                 ),
                               ),
                         // SliverToBoxAdapter(
@@ -169,15 +182,23 @@ class _ViewVideoState extends State<ViewVideo> {
                         //   ),
                         // ),
                         SliverToBoxAdapter(
-                          child: HorizontalVideos(
-                              fun: getVideoInfo,
-                              youtubePlayerController: _controller,
-                              title: "Releted",
-                              // reletedFun:reletedVideos(),
-                              horizontalVideos: reletedVideos),
+                          child: Column(
+                            children: [
+                              HorizontalVideos(
+                                  counterFun: counterFun,
+                                  fun: getVideoInfo,
+                                  youtubePlayerController: _controller,
+                                  title: "Releted",
+                                  // reletedFun:reletedVideos(),
+                                  horizontalVideos: reletedVideos,
+                                  count: numofitemClick),
+                            ],
+                          ),
                         ),
                         SliverToBoxAdapter(
                           child: HorizontalVideos(
+                            counterFun: counterFun,
+                            count: numofitemClick,
                             fun: getVideoInfo,
                             youtubePlayerController: _controller,
                             title: "Trending",
@@ -225,6 +246,7 @@ class _ViewVideoState extends State<ViewVideo> {
                           ),
                         ),
                         PopularGrid(
+                          counterFun: counterFun,
                           videos: mostviewsVideos,
                           fun: getVideoInfo,
                           youtubePlayerController: _controller,
@@ -367,10 +389,12 @@ class PopularGrid extends StatelessWidget {
     this.videos,
     required this.youtubePlayerController,
     required this.fun,
+    required this.counterFun,
   }) : super(key: key);
   final List<VideoEntity>? videos;
   final YoutubePlayerController youtubePlayerController;
   final Function fun;
+  final Function counterFun;
 
   @override
   Widget build(BuildContext context) {
@@ -408,6 +432,7 @@ class PopularGrid extends StatelessWidget {
                         onTap: (() {
                           fun.call(videos![index].videoLink);
                           youtubePlayerController.load(id);
+                          counterFun.call();
                         }),
                         child: Stack(
                           children: [
@@ -469,18 +494,29 @@ class HorizontalVideos extends StatefulWidget {
     required this.youtubePlayerController,
     required this.fun,
     this.reletedFun,
+    required this.count,
+    required this.counterFun,
   }) : super(key: key);
   final String title;
   final List<VideoEntity> horizontalVideos;
   final YoutubePlayerController youtubePlayerController;
   final Function fun;
   final Function? reletedFun;
+  final Function counterFun;
+  final int count;
 
   @override
   State<HorizontalVideos> createState() => _HorizontalVideosState();
 }
 
 class _HorizontalVideosState extends State<HorizontalVideos> {
+  int mycount = 0;
+  @override
+  void initState() {
+    mycount = widget.count;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     List<VideoEntity> videos = widget.horizontalVideos;
@@ -557,8 +593,7 @@ class _HorizontalVideosState extends State<HorizontalVideos> {
                                 widget.fun.call(videos[index].videoLink);
 
                                 widget.youtubePlayerController.load(id);
-                                // setVideos(widget
-                                //     .horizontalVideos[index].category);
+                                widget.counterFun.call();
                               }),
                               child: Center(
                                 child: Container(
